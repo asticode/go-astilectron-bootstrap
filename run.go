@@ -23,10 +23,10 @@ func Run(o Options) (err error) {
 
 	// Restore resources
 	if o.RestoreAssets != nil {
-		var rp = filepath.Join(a.BaseDirectoryPath(), "resources")
+		var rp = filepath.Join(a.Paths().BaseDirectory(), "resources")
 		if _, err = os.Stat(rp); os.IsNotExist(err) {
 			astilog.Debugf("Restoring resources in %s", rp)
-			if err = o.RestoreAssets(a.BaseDirectoryPath(), "resources"); err != nil {
+			if err = o.RestoreAssets(a.Paths().BaseDirectory(), "resources"); err != nil {
 				err = errors.Wrapf(err, "restoring resources in %s failed", rp)
 				return
 			}
@@ -50,7 +50,7 @@ func Run(o Options) (err error) {
 
 	// Init window
 	var w *astilectron.Window
-	if w, err = a.NewWindow(filepath.Join(a.BaseDirectoryPath(), "resources", "app", o.Homepage), o.WindowOptions); err != nil {
+	if w, err = a.NewWindow(filepath.Join(a.Paths().BaseDirectory(), "resources", "app", o.Homepage), o.WindowOptions); err != nil {
 		return errors.Wrap(err, "new window failed")
 	}
 
