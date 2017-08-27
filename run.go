@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/asticode/go-astilectron"
+	"github.com/asticode/go-astilectron-bundler"
 	"github.com/asticode/go-astilog"
 	"github.com/pkg/errors"
 )
@@ -19,7 +20,10 @@ func Run(o Options) (err error) {
 	defer a.Close()
 	a.HandleSignals()
 
-	// TODO Set bindata provisioner
+	// Set provisioner
+	if o.Asset != nil {
+		a.SetProvisioner(astibundler.NewProvisioner(o.Asset))
+	}
 
 	// Restore resources
 	if o.RestoreAssets != nil {
