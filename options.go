@@ -20,7 +20,7 @@ type Options struct {
 }
 
 // MessageHandler is a functions that handles messages
-type MessageHandler func(w *astilectron.Window, m MessageIn)
+type MessageHandler func(w *astilectron.Window, m MessageIn) (payload interface{}, err error)
 
 // OnWait is a function that executes custom actions before waiting
 type OnWait func(a *astilectron.Astilectron, w *astilectron.Window, m *astilectron.Menu, t *astilectron.Tray, tm *astilectron.Menu) error
