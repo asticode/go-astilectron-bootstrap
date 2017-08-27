@@ -12,6 +12,25 @@ import (
 
 // Run runs the bootstrap
 func Run(o Options) (err error) {
+	// Get executable path
+	var p string
+	if p, err = os.Executable(); err != nil {
+		err = errors.Wrap(err, "os.Executable failed")
+		return
+	}
+	p = filepath.Dir(p)
+
+	// Make sure option paths are absolute
+	if len(o.AstilectronOptions.AppIconDarwinPath) > 0 && !filepath.IsAbs(o.AstilectronOptions.AppIconDarwinPath) {
+		o.AstilectronOptions.AppIconDarwinPath = filepath.Join(p, o.AstilectronOptions.AppIconDarwinPath)
+	}
+	if len(o.AstilectronOptions.AppIconDefaultPath) > 0 && !filepath.IsAbs(o.AstilectronOptions.AppIconDefaultPath) {
+		o.AstilectronOptions.AppIconDefaultPath = filepath.Join(p, o.AstilectronOptions.AppIconDefaultPath)
+	}
+	if o.TrayOptions != nil && o.TrayOptions.Image != nil && !filepath.IsAbs(*o.TrayOptions.Image) {
+		*o.TrayOptions.Image = filepath.Join(p, *o.TrayOptions.Image)
+	}
+
 	// Create astilectron
 	var a *astilectron.Astilectron
 	if a, err = astilectron.New(o.AstilectronOptions); err != nil {
