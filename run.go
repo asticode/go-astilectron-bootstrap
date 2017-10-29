@@ -113,6 +113,11 @@ func Run(o Options) (err error) {
 		// Init tray
 		t = a.NewTray(o.TrayOptions)
 
+		// Create tray
+		if err = t.Create(); err != nil {
+			return errors.Wrap(err, "creating tray failed")
+		}
+
 		// Tray menu
 		if len(o.TrayMenuOptions) > 0 {
 			// Init tray menu
@@ -122,11 +127,6 @@ func Run(o Options) (err error) {
 			if err = tm.Create(); err != nil {
 				return errors.Wrap(err, "creating tray menu failed")
 			}
-		}
-
-		// Create tray
-		if err = t.Create(); err != nil {
-			return errors.Wrap(err, "creating tray failed")
 		}
 	}
 
