@@ -22,12 +22,12 @@ type MessageIn struct {
 
 // handleMessages handles messages
 func handleMessages(w *astilectron.Window, messageHandler MessageHandler) astilectron.ListenerMessage {
-	return func(e astilectron.Event) (v interface{}) {
+	return func(m *astilectron.EventMessage) (v interface{}) {
 		// Unmarshal message
 		var i MessageIn
 		var err error
-		if err = e.Message.Unmarshal(&i); err != nil {
-			astilog.Error(errors.Wrapf(err, "unmarshaling message %+v failed", *e.Message))
+		if err = m.Unmarshal(&i); err != nil {
+			astilog.Error(errors.Wrapf(err, "unmarshaling message %+v failed", *m))
 			return
 		}
 
