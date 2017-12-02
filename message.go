@@ -12,14 +12,14 @@ import (
 type MessageOut struct {
 	CallbackID *int        `json:"callbackId,omitempty"`
 	Name       string      `json:"name"`
-	Payload    interface{} `json:"payload"`
+	Payload    interface{} `json:"payload,omitempty"`
 }
 
 // MessageIn represents a message going in
 type MessageIn struct {
 	CallbackID *int            `json:"callbackId,omitempty"`
 	Name       string          `json:"name"`
-	Payload    json.RawMessage `json:"payload"`
+	Payload    json.RawMessage `json:"payload,omitempty"`
 }
 
 // handleMessages handles messages
