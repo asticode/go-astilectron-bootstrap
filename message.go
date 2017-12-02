@@ -10,43 +10,40 @@ import (
 
 // MessageOut represents a message going out
 type MessageOut struct {
-	CallbackID *int        `json:"callbackId,omitempty"`
-	Name       string      `json:"name"`
-	Payload    interface{} `json:"payload,omitempty"`
+	Name    string      `json:"name"`
+	Payload interface{} `json:"payload,omitempty"`
 }
 
 // MessageIn represents a message going in
 type MessageIn struct {
-	CallbackID *int            `json:"callbackId,omitempty"`
-	Name       string          `json:"name"`
-	Payload    json.RawMessage `json:"payload,omitempty"`
+	Name    string          `json:"name"`
+	Payload json.RawMessage `json:"payload,omitempty"`
 }
 
 // handleMessages handles messages
-func handleMessages(w *astilectron.Window, messageHandler MessageHandler) astilectron.Listener {
-	return func(e astilectron.Event) (deleteListener bool) {
+func handleMessages(w *astilectron.Window, messageHandler MessageHandler) astilectron.ListenerMessage {
+	return func(e astilectron.Event) (v interface{}) {
 		// Unmarshal message
-		var m MessageIn
+		var i MessageIn
 		var err error
-		if err = e.Message.Unmarshal(&m); err != nil {
+		if err = e.Message.Unmarshal(&i); err != nil {
 			astilog.Error(errors.Wrapf(err, "unmarshaling message %+v failed", *e.Message))
 			return
 		}
 
 		// Handle message
 		var p interface{}
-		if p, err = messageHandler(w, m); err != nil {
-			astilog.Error(errors.Wrapf(err, "handling message %+v failed", m))
-			return
+		if p, err = messageHandler(w, i); err != nil {
+			astilog.Error(errors.Wrapf(err, "handling message %+v failed", i))
 		}
 
-		// Send message
-		if p != nil && m.CallbackID != nil {
-			var m = MessageOut{CallbackID: m.CallbackID, Name: m.Name, Payload: p}
-			if err = w.Send(m); err != nil {
-				astilog.Error(errors.Wrapf(err, "sending message %+v failed", m))
-				return
+		// Return message
+		if p != nil {
+			o := &MessageOut{Name: i.Name + ".callback", Payload: p}
+			if err != nil {
+				o.Name = "error"
 			}
+			v = o
 		}
 		return
 	}

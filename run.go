@@ -79,7 +79,7 @@ func Run(o Options) (err error) {
 
 	// Handle messages
 	if o.MessageHandler != nil {
-		w.On(astilectron.EventNameWindowEventMessage, handleMessages(w, o.MessageHandler))
+		w.OnMessage(handleMessages(w, o.MessageHandler))
 	}
 
 	// Create window
