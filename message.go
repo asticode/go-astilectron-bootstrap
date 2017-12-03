@@ -48,3 +48,25 @@ func handleMessages(w *astilectron.Window, messageHandler MessageHandler) astile
 		return
 	}
 }
+
+// CallbackMessage represents a bootstrap message callback
+type CallbackMessage func(m *MessageIn)
+
+// SendMessage sends a message
+func SendMessage(w *astilectron.Window, name string, payload interface{}, cs ...CallbackMessage) error {
+	var callbacks []astilectron.CallbackMessage
+	for _, c := range cs {
+		callbacks = append(callbacks, func(e *astilectron.EventMessage) {
+			var m *MessageIn
+			if e != nil {
+				m = &MessageIn{}
+				if err := e.Unmarshal(m); err != nil {
+					astilog.Error(errors.Wrap(err, "unmarshaling event message failed"))
+					return
+				}
+			}
+			c(m)
+		})
+	}
+	return w.SendMessage(MessageOut{Name: name, Payload: payload}, callbacks...)
+}
