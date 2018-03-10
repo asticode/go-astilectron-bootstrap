@@ -7,6 +7,7 @@ import (
 	"github.com/asticode/go-astilectron"
 	"github.com/asticode/go-astilectron-bundler"
 	"github.com/asticode/go-astilog"
+	"github.com/asticode/go-astitools/ptr"
 	"github.com/pkg/errors"
 )
 
@@ -66,11 +67,6 @@ func Run(o Options) (err error) {
 		return errors.Wrap(err, "starting astilectron failed")
 	}
 
-	// Debug
-	if o.Debug {
-		o.WindowOptions.Width = astilectron.PtrInt(*o.WindowOptions.Width + 700)
-	}
-
 	// Init window
 	var w *astilectron.Window
 	if w, err = a.NewWindow(filepath.Join(a.Paths().BaseDirectory(), "resources", "app", o.Homepage), o.WindowOptions); err != nil {
@@ -89,8 +85,42 @@ func Run(o Options) (err error) {
 
 	// Debug
 	if o.Debug {
-		if err = w.OpenDevTools(); err != nil {
-			return errors.Wrap(err, "opening dev tools failed")
+		// Create menu item
+		var debug bool
+		width := *o.WindowOptions.Width
+		mi := &astilectron.MenuItemOptions{
+			Accelerator: astilectron.NewAccelerator("d"),
+			Label:       astiptr.Str("Debug"),
+			OnClick: func(e astilectron.Event) (deleteListener bool) {
+				if debug {
+					if err := w.CloseDevTools(); err != nil {
+						astilog.Error(errors.Wrap(err, "closing dev tools failed"))
+					}
+					if err := w.Resize(width, *o.WindowOptions.Height); err != nil {
+						astilog.Error(errors.Wrap(err, "resizing window failed"))
+					}
+				} else {
+					if err := w.OpenDevTools(); err != nil {
+						astilog.Error(errors.Wrap(err, "opening dev tools failed"))
+					}
+					if err := w.Resize(width+700, *o.WindowOptions.Height); err != nil {
+						astilog.Error(errors.Wrap(err, "resizing window failed"))
+					}
+				}
+				debug = !debug
+				return
+			},
+			Type: astilectron.MenuItemTypeCheckbox,
+		}
+
+		// Add menu item
+		if len(o.MenuOptions) == 0 {
+			o.MenuOptions = []*astilectron.MenuItemOptions{{SubMenu: []*astilectron.MenuItemOptions{mi}}}
+		} else {
+			if len(o.MenuOptions[0].SubMenu) > 0 {
+				o.MenuOptions[0].SubMenu = append(o.MenuOptions[0].SubMenu, &astilectron.MenuItemOptions{Type: astilectron.MenuItemTypeSeparator})
+			}
+			o.MenuOptions[0].SubMenu = append(o.MenuOptions[0].SubMenu, mi)
 		}
 	}
 
