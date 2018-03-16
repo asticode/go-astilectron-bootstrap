@@ -89,7 +89,7 @@ func Run(o Options) (err error) {
 		var debug bool
 		width := *o.WindowOptions.Width
 		mi := &astilectron.MenuItemOptions{
-			Accelerator: astilectron.NewAccelerator("d"),
+			Accelerator: astilectron.NewAccelerator("CmdOrCtrl+d"),
 			Label:       astiptr.Str("Debug"),
 			OnClick: func(e astilectron.Event) (deleteListener bool) {
 				if debug {
