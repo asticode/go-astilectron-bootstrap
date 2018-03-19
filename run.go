@@ -9,7 +9,6 @@ import (
 	"github.com/asticode/go-astilog"
 	"github.com/asticode/go-astitools/ptr"
 	"github.com/pkg/errors"
-	"log"
 )
 
 // Run runs the bootstrap
