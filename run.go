@@ -69,8 +69,14 @@ func Run(o Options) (err error) {
 
 	// Init window
 	var w *astilectron.Window
-	if w, err = a.NewWindow(filepath.Join(a.Paths().BaseDirectory(), "resources", "app", o.Homepage), o.WindowOptions); err != nil {
-		return errors.Wrap(err, "new window failed")
+	if o.HomeDirectory != "" {
+		if w, err = a.NewWindow(filepath.Join(a.Paths().BaseDirectory(), o.HomeDirectory, o.Homepage), o.WindowOptions); err != nil {
+			return errors.Wrap(err, "new window failed")
+		}
+	} else {
+		if w, err = a.NewWindow(filepath.Join(a.Paths().BaseDirectory(), "resources", "app", o.Homepage), o.WindowOptions); err != nil {
+			return errors.Wrap(err, "new window failed")
+		}
 	}
 
 	// Handle messages
