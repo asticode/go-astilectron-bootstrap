@@ -9,6 +9,7 @@ import (
 	"github.com/asticode/go-astilog"
 	"github.com/asticode/go-astitools/ptr"
 	"github.com/pkg/errors"
+	"log"
 )
 
 // Run runs the bootstrap
@@ -47,10 +48,10 @@ func Run(o Options) (err error) {
 
 	// Restore resources
 	if o.RestoreAssets != nil {
-		var rp = filepath.Join(a.Paths().BaseDirectory(), "resources")
+		var rp = filepath.Join(a.Paths().BaseDirectory(), o.HomeResource)
 		if _, err = os.Stat(rp); os.IsNotExist(err) {
 			astilog.Debugf("Restoring resources in %s", rp)
-			if err = o.RestoreAssets(a.Paths().BaseDirectory(), "resources"); err != nil {
+			if err = o.RestoreAssets(a.Paths().BaseDirectory(), o.HomeResource); err != nil {
 				err = errors.Wrapf(err, "restoring resources in %s failed", rp)
 				return
 			}
