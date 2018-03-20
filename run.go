@@ -47,7 +47,7 @@ func Run(o Options) (err error) {
 
 	var resourcesPath string
 	if resourcesPath = o.ResourcesPath; resourcesPath == "" {
-		resourcesPath = "resources"
+	  resourcesPath = "resources"
 	}
 
 	// Restore resources
