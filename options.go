@@ -9,7 +9,7 @@ type Options struct {
 	Asset              Asset
 	AstilectronOptions astilectron.Options
 	Debug              bool
-	HomeResource       string
+	ResourcesPath      string
 	Homepage           string
 	MenuOptions        []*astilectron.MenuItemOptions
 	MessageHandler     MessageHandler

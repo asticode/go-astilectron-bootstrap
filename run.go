@@ -45,17 +45,17 @@ func Run(o Options) (err error) {
 		a.SetProvisioner(astibundler.NewProvisioner(o.Asset))
 	}
 
-	var homeResource string
-	if homeResource = o.HomeResource; homeResource == "" {
-		homeResource = "resources"
+	var resourcesPath string
+	if resourcesPath = o.ResourcesPath; resourcesPath == "" {
+		resourcesPath = "resources"
 	}
 
 	// Restore resources
 	if o.RestoreAssets != nil {
-		var rp = filepath.Join(a.Paths().BaseDirectory(), homeResource)
+		var rp = filepath.Join(a.Paths().BaseDirectory(), resourcesPath)
 		if _, err = os.Stat(rp); os.IsNotExist(err) {
 			astilog.Debugf("Restoring resources in %s", rp)
-			if err = o.RestoreAssets(a.Paths().BaseDirectory(), homeResource); err != nil {
+			if err = o.RestoreAssets(a.Paths().BaseDirectory(), resourcesPath); err != nil {
 				err = errors.Wrapf(err, "restoring resources in %s failed", rp)
 				return
 			}
@@ -74,7 +74,7 @@ func Run(o Options) (err error) {
 
 	// Init window
 	var w *astilectron.Window
-	if w, err = a.NewWindow(filepath.Join(a.Paths().BaseDirectory(), homeResource, o.Homepage), o.WindowOptions); err != nil {
+	if w, err = a.NewWindow(filepath.Join(a.Paths().BaseDirectory(), resourcesPath, o.Homepage), o.WindowOptions); err != nil {
 		return errors.Wrap(err, "new window failed")
 	}
 
