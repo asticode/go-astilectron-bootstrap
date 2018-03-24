@@ -45,9 +45,10 @@ func Run(o Options) (err error) {
 		a.SetProvisioner(astibundler.NewProvisioner(o.Asset))
 	}
 
+	// Get resources path
 	var resourcesPath string
 	if resourcesPath = o.ResourcesPath; resourcesPath == "" {
-	  resourcesPath = "resources"
+		resourcesPath = "resources"
 	}
 
 	// Restore resources
