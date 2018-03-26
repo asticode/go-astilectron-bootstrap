@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/asticode/go-astilectron"
 	"github.com/asticode/go-astilectron-bundler"
@@ -75,7 +76,11 @@ func Run(o Options) (err error) {
 
 	// Init window
 	var w *astilectron.Window
-	if w, err = a.NewWindow(filepath.Join(a.Paths().BaseDirectory(), resourcesPath, "app", o.Homepage), o.WindowOptions); err != nil {
+	var url = o.Homepage
+	if strings.Index(o.Homepage, "://") == -1 && !strings.HasPrefix(o.Homepage, string(filepath.Separator)) {
+		url = filepath.Join(a.Paths().BaseDirectory(), resourcesPath, "app", o.Homepage)
+	}
+	if w, err = a.NewWindow(url, o.WindowOptions); err != nil {
 		return errors.Wrap(err, "new window failed")
 	}
 
