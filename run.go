@@ -76,7 +76,7 @@ func Run(o Options) (err error) {
 	// Init window
 	var w *astilectron.Window
 	var url = o.Homepage
-	if !strings.HasPrefix(o.Homepage, "http") && !strings.HasPrefix(o.Homepage, string(filepath.Separator)) {
+	if strings.Index(o.Homepage, "://") == -1 && !strings.HasPrefix(o.Homepage, string(filepath.Separator)) {
 		url = filepath.Join(a.Paths().BaseDirectory(), resourcesPath, "app", o.Homepage)
 	}
 	if w, err = a.NewWindow(url, o.WindowOptions); err != nil {
