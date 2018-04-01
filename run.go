@@ -48,16 +48,16 @@ func Run(o Options) (err error) {
 
 	// Get resources path
 	var resourcesPath string
-	if resourcesPath = o.ResourcesPath; resourcesPath == "" {
+	if resourcesPath = o.ResourcesPath; len(resourcesPath) == 0 {
 		resourcesPath = "resources"
 	}
 
 	// Restore resources
 	if o.RestoreAssets != nil {
-		var rp = filepath.Join(a.Paths().BaseDirectory(), resourcesPath)
+		var rp = filepath.Join(a.Paths().DataDirectory(), resourcesPath)
 		if _, err = os.Stat(rp); os.IsNotExist(err) {
 			astilog.Debugf("Restoring resources in %s", rp)
-			if err = o.RestoreAssets(a.Paths().BaseDirectory(), resourcesPath); err != nil {
+			if err = o.RestoreAssets(a.Paths().DataDirectory(), resourcesPath); err != nil {
 				err = errors.Wrapf(err, "restoring resources in %s failed", rp)
 				return
 			}
@@ -78,7 +78,7 @@ func Run(o Options) (err error) {
 	var w *astilectron.Window
 	var url = o.Homepage
 	if strings.Index(o.Homepage, "://") == -1 && !strings.HasPrefix(o.Homepage, string(filepath.Separator)) {
-		url = filepath.Join(a.Paths().BaseDirectory(), resourcesPath, "app", o.Homepage)
+		url = filepath.Join(a.Paths().DataDirectory(), resourcesPath, "app", o.Homepage)
 	}
 	if w, err = a.NewWindow(url, o.WindowOptions); err != nil {
 		return errors.Wrap(err, "new window failed")
