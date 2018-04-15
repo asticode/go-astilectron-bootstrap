@@ -20,8 +20,8 @@ type MessageIn struct {
 	Payload json.RawMessage `json:"payload,omitempty"`
 }
 
-// handleMessages handles messages
-func handleMessages(w *astilectron.Window, messageHandler MessageHandler) astilectron.ListenerMessage {
+// HandleMessages handles messages
+func HandleMessages(w *astilectron.Window, messageHandler MessageHandler) astilectron.ListenerMessage {
 	return func(m *astilectron.EventMessage) (v interface{}) {
 		// Unmarshal message
 		var i MessageIn

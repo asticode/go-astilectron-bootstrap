@@ -86,7 +86,7 @@ func Run(o Options) (err error) {
 
 	// Handle messages
 	if o.MessageHandler != nil {
-		w.OnMessage(handleMessages(w, o.MessageHandler))
+		w.OnMessage(HandleMessages(w, o.MessageHandler))
 	}
 
 	// Create window
