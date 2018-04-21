@@ -17,6 +17,7 @@ type Options struct {
 	RestoreAssets      RestoreAssets
 	TrayMenuOptions    []*astilectron.MenuItemOptions
 	TrayOptions        *astilectron.TrayOptions
+	WindowAdapter      WindowAdapter
 	WindowOptions      *astilectron.WindowOptions
 }
 
@@ -31,3 +32,6 @@ type Asset func(name string) ([]byte, error)
 
 // RestoreAssets is a function that restores assets namely the go-bindata's RestoreAssets method
 type RestoreAssets func(dir, name string) error
+
+// WindowAdapter is a function that adapts a window
+type WindowAdapter func(w *astilectron.Window)

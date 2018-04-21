@@ -89,6 +89,11 @@ func Run(o Options) (err error) {
 		w.OnMessage(HandleMessages(w, o.MessageHandler))
 	}
 
+	// Adapt window
+	if o.WindowAdapter != nil {
+		o.WindowAdapter(w)
+	}
+
 	// Create window
 	if err = w.Create(); err != nil {
 		return errors.Wrap(err, "creating window failed")
