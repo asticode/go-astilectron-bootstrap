@@ -83,57 +83,62 @@ func Run(o Options) (err error) {
 		return errors.Wrap(err, "starting astilectron failed")
 	}
 
-	// Init window
-	var w *astilectron.Window
-	var url = o.Homepage
-	if strings.Index(o.Homepage, "://") == -1 && !strings.HasPrefix(o.Homepage, string(filepath.Separator)) {
-		url = filepath.Join(absoluteResourcesPath, "app", o.Homepage)
-	}
-	if w, err = a.NewWindow(url, o.WindowOptions); err != nil {
-		return errors.Wrap(err, "new window failed")
-	}
+	// Init windows
+	var w []*astilectron.Window = make([]*astilectron.Window, len(o.Windows))
+        for i, wo := range o.Windows {
+                var url = wo.Homepage
+                if strings.Index(url, "://") == -1 && !strings.HasPrefix(url, string(filepath.Separator)) {
+                        url = filepath.Join(absoluteResourcesPath, "app", url)
+                }
+                if w[i], err = a.NewWindow(url, wo.WindowOptions); err != nil {
+                        return errors.Wrap(err, "new window failed")
+                }
 
-	// Handle messages
-	if o.MessageHandler != nil {
-		w.OnMessage(HandleMessages(w, o.MessageHandler))
-	}
+                // Handle messages
+                if wo.MessageHandler != nil {
+                        w[i].OnMessage(HandleMessages(w[i], wo.MessageHandler))
+                }
 
-	// Adapt window
-	if o.WindowAdapter != nil {
-		o.WindowAdapter(w)
-	}
+                // Adapt window
+                if wo.WindowAdapter != nil {
+                        wo.WindowAdapter(w[i])
+                }
 
-	// Create window
-	if err = w.Create(); err != nil {
-		return errors.Wrap(err, "creating window failed")
-	}
+                // Create window
+                if err = w[i].Create(); err != nil {
+                        return errors.Wrap(err, "creating window failed")
+                }
+        }
+
 
 	// Debug
 	if o.Debug {
 		// Create menu item
 		var debug bool
-		width := *o.WindowOptions.Width
 		mi := &astilectron.MenuItemOptions{
 			Accelerator: astilectron.NewAccelerator("Control", "d"),
 			Label:       astiptr.Str("Debug"),
 			OnClick: func(e astilectron.Event) (deleteListener bool) {
-				if debug {
-					if err := w.CloseDevTools(); err != nil {
-						astilog.Error(errors.Wrap(err, "closing dev tools failed"))
-					}
-					if err := w.Resize(width, *o.WindowOptions.Height); err != nil {
-						astilog.Error(errors.Wrap(err, "resizing window failed"))
-					}
-				} else {
-					if err := w.OpenDevTools(); err != nil {
-						astilog.Error(errors.Wrap(err, "opening dev tools failed"))
-					}
-					if err := w.Resize(width+700, *o.WindowOptions.Height); err != nil {
-						astilog.Error(errors.Wrap(err, "resizing window failed"))
-					}
-				}
-				debug = !debug
-				return
+                                for i, window := range w {
+		                        width := *o.Windows[i].WindowOptions.Width
+                                        if debug {
+                                                if err := window.CloseDevTools(); err != nil {
+                                                        astilog.Error(errors.Wrap(err, "closing dev tools failed"))
+                                                }
+                                                if err := window.Resize(width, *o.Windows[i].WindowOptions.Height); err != nil {
+                                                        astilog.Error(errors.Wrap(err, "resizing window failed"))
+                                                }
+                                        } else {
+                                                if err := window.OpenDevTools(); err != nil {
+                                                        astilog.Error(errors.Wrap(err, "opening dev tools failed"))
+                                                }
+                                                if err := window.Resize(width+700, *o.Windows[i].WindowOptions.Height); err != nil {
+                                                        astilog.Error(errors.Wrap(err, "resizing window failed"))
+                                                }
+                                        }
+                                }
+                                debug = !debug
+                                return
 			},
 			Type: astilectron.MenuItemTypeCheckbox,
 		}
