@@ -16,15 +16,15 @@ type Options struct {
 	RestoreAssets      RestoreAssets
 	TrayMenuOptions    []*astilectron.MenuItemOptions
 	TrayOptions        *astilectron.TrayOptions
-        Windows            []*Window
+	Windows            []*Window
 }
 
 // Options to setup and create a new window
 type Window struct {
-	Homepage           string
-	MessageHandler     MessageHandler
-        WindowOptions      *astilectron.WindowOptions
-	WindowAdapter      WindowAdapter
+	Adapter        WindowAdapter
+	Homepage       string
+	MessageHandler MessageHandler
+	Options        *astilectron.WindowOptions
 }
 
 // Asset is a function that retrieves an asset content namely the go-bindata's Asset method
