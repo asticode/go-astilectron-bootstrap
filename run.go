@@ -44,6 +44,11 @@ func Run(o Options) (err error) {
 	defer a.Close()
 	a.HandleSignals()
 
+	// Adapt astilectron
+	if o.Adapter != nil {
+		o.Adapter(a)
+	}
+
 	// Set provisioner
 	if o.Asset != nil {
 		a.SetProvisioner(astibundler.NewProvisioner(o.Asset))

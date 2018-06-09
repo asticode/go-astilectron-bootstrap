@@ -6,6 +6,7 @@ import (
 
 // Options represents options
 type Options struct {
+	Adapter            AstilectronAdapter
 	Asset              Asset
 	AssetDir           AssetDir
 	AstilectronOptions astilectron.Options
@@ -26,6 +27,9 @@ type Window struct {
 	MessageHandler MessageHandler
 	Options        *astilectron.WindowOptions
 }
+
+// AstilectronAdapter is a function that adapts the astilectron instance
+type AstilectronAdapter func(w *astilectron.Astilectron)
 
 // Asset is a function that retrieves an asset content namely the go-bindata's Asset method
 type Asset func(name string) ([]byte, error)
