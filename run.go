@@ -17,31 +17,14 @@ import (
 
 // Run runs the bootstrap
 func Run(o Options) (err error) {
-	// Get executable path
-	var p string
-	if p, err = os.Executable(); err != nil {
-		err = errors.Wrap(err, "os.Executable failed")
-		return
-	}
-	p = filepath.Dir(p)
-
-	// Make sure option paths are absolute
-	if len(o.AstilectronOptions.AppIconDarwinPath) > 0 && !filepath.IsAbs(o.AstilectronOptions.AppIconDarwinPath) {
-		o.AstilectronOptions.AppIconDarwinPath = filepath.Join(p, o.AstilectronOptions.AppIconDarwinPath)
-	}
-	if len(o.AstilectronOptions.AppIconDefaultPath) > 0 && !filepath.IsAbs(o.AstilectronOptions.AppIconDefaultPath) {
-		o.AstilectronOptions.AppIconDefaultPath = filepath.Join(p, o.AstilectronOptions.AppIconDefaultPath)
-	}
-	if o.TrayOptions != nil && o.TrayOptions.Image != nil && !filepath.IsAbs(*o.TrayOptions.Image) {
-		*o.TrayOptions.Image = filepath.Join(p, *o.TrayOptions.Image)
-	}
-
 	// Create astilectron
 	var a *astilectron.Astilectron
 	if a, err = astilectron.New(o.AstilectronOptions); err != nil {
 		return errors.Wrap(err, "creating new astilectron failed")
 	}
 	defer a.Close()
+
+	// Handle signals
 	a.HandleSignals()
 
 	// Adapt astilectron
@@ -159,6 +142,11 @@ func Run(o Options) (err error) {
 	var t *astilectron.Tray
 	var tm *astilectron.Menu
 	if o.TrayOptions != nil {
+		// Make sure path to image is absolute
+		if o.TrayOptions.Image != nil && !filepath.IsAbs(*o.TrayOptions.Image) {
+			*o.TrayOptions.Image = filepath.Join(a.Paths().DataDirectory(), *o.TrayOptions.Image)
+		}
+
 		// Init tray
 		t = a.NewTray(o.TrayOptions)
 
