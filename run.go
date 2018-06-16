@@ -59,27 +59,12 @@ func Run(o Options) (err error) {
 	if len(relativeResourcesPath) == 0 {
 		relativeResourcesPath = "resources"
 	}
-	var absoluteResourcesPath = filepath.Join(a.Paths().DataDirectory(), relativeResourcesPath)
 
 	// Restore resources
 	if o.RestoreAssets != nil {
-		// Check resources
-		var restore bool
-		var computedChecksums map[string]string
-		var checksumsPath string
-		if restore, computedChecksums, checksumsPath, err = checkResources(o.Asset, o.AssetDir, relativeResourcesPath, absoluteResourcesPath); err != nil {
-			err = errors.Wrap(err, "checking resources failed")
+		if err = RestoreResources(a, o.Asset, o.AssetDir, o.RestoreAssets, relativeResourcesPath); err != nil {
+			err = errors.Wrap(err, "restoring resources failed")
 			return
-		}
-
-		// Restore resources
-		if restore {
-			if err = restoreResources(a, relativeResourcesPath, absoluteResourcesPath, o.RestoreAssets, computedChecksums, checksumsPath); err != nil {
-				err = errors.Wrap(err, "restoring resources failed")
-				return
-			}
-		} else {
-			astilog.Debug("Skipping restoring resources...")
 		}
 	}
 
@@ -93,7 +78,7 @@ func Run(o Options) (err error) {
 	for i, wo := range o.Windows {
 		var url = wo.Homepage
 		if strings.Index(url, "://") == -1 && !strings.HasPrefix(url, string(filepath.Separator)) {
-			url = filepath.Join(absoluteResourcesPath, "app", url)
+			url = filepath.Join(absoluteResourcesPath(a, relativeResourcesPath), "app", url)
 		}
 		if w[i], err = a.NewWindow(url, wo.Options); err != nil {
 			return errors.Wrap(err, "new window failed")
@@ -206,9 +191,36 @@ func Run(o Options) (err error) {
 	return
 }
 
-func checkResources(asset Asset, assetDir AssetDir, relativeResourcesPath, absoluteResourcesPath string) (restore bool, computedChecksums map[string]string, checksumsPath string, err error) {
+func absoluteResourcesPath(a *astilectron.Astilectron, relativeResourcesPath string) string {
+	return filepath.Join(a.Paths().DataDirectory(), relativeResourcesPath)
+}
+
+func RestoreResources(a *astilectron.Astilectron, asset Asset, assetDir AssetDir, assetRestorer RestoreAssets, relativeResourcesPath string) (err error) {
+	// Check resources
+	var restore bool
+	var computedChecksums map[string]string
+	var checksumsPath string
+	if restore, computedChecksums, checksumsPath, err = checkResources(a, asset, assetDir, relativeResourcesPath); err != nil {
+		err = errors.Wrap(err, "checking resources failed")
+		return
+	}
+
+	// Restore resources
+	if restore {
+		if err = restoreResources(a, relativeResourcesPath, assetRestorer, computedChecksums, checksumsPath); err != nil {
+			err = errors.Wrap(err, "restoring resources failed")
+			return
+		}
+	} else {
+		astilog.Debug("Skipping restoring resources...")
+	}
+	return
+}
+
+func checkResources(a *astilectron.Astilectron, asset Asset, assetDir AssetDir, relativeResourcesPath string) (restore bool, computedChecksums map[string]string, checksumsPath string, err error) {
 	// Compute checksums
-	checksumsPath = filepath.Join(absoluteResourcesPath, "checksums.json")
+	arp := absoluteResourcesPath(a, relativeResourcesPath)
+	checksumsPath = filepath.Join(arp, "checksums.json")
 	if asset != nil && assetDir != nil {
 		computedChecksums = make(map[string]string)
 		if err = checksumAssets(asset, assetDir, relativeResourcesPath, computedChecksums); err != nil {
@@ -218,8 +230,8 @@ func checkResources(asset Asset, assetDir AssetDir, relativeResourcesPath, absol
 	}
 
 	// Stat resources
-	if _, err = os.Stat(absoluteResourcesPath); err != nil && !os.IsNotExist(err) {
-		err = errors.Wrapf(err, "stating %s failed", absoluteResourcesPath)
+	if _, err = os.Stat(arp); err != nil && !os.IsNotExist(err) {
+		err = errors.Wrapf(err, "stating %s failed", arp)
 		return
 	} else if os.IsNotExist(err) {
 		astilog.Debug("Resources folder doesn't exist, restoring resources...")
@@ -332,18 +344,19 @@ func checksumAsset(asset Asset, name string) (o string, err error) {
 	return
 }
 
-func restoreResources(a *astilectron.Astilectron, relativeResourcesPath, absoluteResourcesPath string, restoreAssets RestoreAssets, computedChecksums map[string]string, checksumsPath string) (err error) {
+func restoreResources(a *astilectron.Astilectron, relativeResourcesPath string, assetRestorer RestoreAssets, computedChecksums map[string]string, checksumsPath string) (err error) {
 	// Remove resources
-	astilog.Debugf("Removing %s", absoluteResourcesPath)
-	if err = os.RemoveAll(absoluteResourcesPath); err != nil {
-		err = errors.Wrapf(err, "removing %s failed", absoluteResourcesPath)
+	arp := absoluteResourcesPath(a, relativeResourcesPath)
+	astilog.Debugf("Removing %s", arp)
+	if err = os.RemoveAll(arp); err != nil {
+		err = errors.Wrapf(err, "removing %s failed", arp)
 		return
 	}
 
 	// Restore resources
-	astilog.Debugf("Restoring resources in %s", absoluteResourcesPath)
-	if err = restoreAssets(a.Paths().DataDirectory(), relativeResourcesPath); err != nil {
-		err = errors.Wrapf(err, "restoring resources in %s failed", absoluteResourcesPath)
+	astilog.Debugf("Restoring resources in %s", arp)
+	if err = assetRestorer(a.Paths().DataDirectory(), relativeResourcesPath); err != nil {
+		err = errors.Wrapf(err, "restoring resources in %s failed", arp)
 		return
 	}
 
