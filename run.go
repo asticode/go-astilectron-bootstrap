@@ -9,9 +9,9 @@ import (
 	"strings"
 
 	"github.com/asticode/go-astilectron"
-	"github.com/asticode/go-astilectron-bundler"
+	astibundler "github.com/asticode/go-astilectron-bundler"
 	"github.com/asticode/go-astilog"
-	"github.com/asticode/go-astitools/ptr"
+	astiptr "github.com/asticode/go-astitools/ptr"
 	"github.com/pkg/errors"
 )
 
@@ -83,6 +83,12 @@ func Run(o Options) (err error) {
 		}
 	}
 
+	// Create menu options
+	mo := o.MenuOptions
+	if o.MenuOptionsFunc != nil {
+		mo = o.MenuOptionsFunc(a)
+	}
+
 	// Debug
 	if o.Debug {
 		// Create menu item
@@ -116,21 +122,21 @@ func Run(o Options) (err error) {
 		}
 
 		// Add menu item
-		if len(o.MenuOptions) == 0 {
-			o.MenuOptions = []*astilectron.MenuItemOptions{{SubMenu: []*astilectron.MenuItemOptions{mi}}}
+		if len(mo) == 0 {
+			mo = []*astilectron.MenuItemOptions{{SubMenu: []*astilectron.MenuItemOptions{mi}}}
 		} else {
-			if len(o.MenuOptions[0].SubMenu) > 0 {
-				o.MenuOptions[0].SubMenu = append(o.MenuOptions[0].SubMenu, &astilectron.MenuItemOptions{Type: astilectron.MenuItemTypeSeparator})
+			if len(mo[0].SubMenu) > 0 {
+				mo[0].SubMenu = append(mo[0].SubMenu, &astilectron.MenuItemOptions{Type: astilectron.MenuItemTypeSeparator})
 			}
-			o.MenuOptions[0].SubMenu = append(o.MenuOptions[0].SubMenu, mi)
+			mo[0].SubMenu = append(mo[0].SubMenu, mi)
 		}
 	}
 
 	// Menu
 	var m *astilectron.Menu
-	if len(o.MenuOptions) > 0 {
+	if len(mo) > 0 {
 		// Init menu
-		m = a.NewMenu(o.MenuOptions)
+		m = a.NewMenu(mo)
 
 		// Create menu
 		if err = m.Create(); err != nil {

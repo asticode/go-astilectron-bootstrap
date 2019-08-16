@@ -12,6 +12,7 @@ type Options struct {
 	AstilectronOptions astilectron.Options
 	Debug              bool
 	MenuOptions        []*astilectron.MenuItemOptions
+	MenuOptionsFunc    func(*astilectron.Astilectron) []*astilectron.MenuItemOptions
 	OnWait             OnWait
 	ResourcesPath      string
 	RestoreAssets      RestoreAssets
