@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/asticode/go-astikit"
 	"github.com/asticode/go-astilectron"
 	astibundler "github.com/asticode/go-astilectron-bundler"
 	"github.com/asticode/go-astilog"
-	astiptr "github.com/asticode/go-astitools/ptr"
 	"github.com/pkg/errors"
 )
 
@@ -95,7 +95,7 @@ func Run(o Options) (err error) {
 		var debug bool
 		mi := &astilectron.MenuItemOptions{
 			Accelerator: astilectron.NewAccelerator("Control", "d"),
-			Label:       astiptr.Str("Debug"),
+			Label:       astikit.StrPtr("Debug"),
 			OnClick: func(e astilectron.Event) (deleteListener bool) {
 				for i, window := range w {
 					width := *o.Windows[i].Options.Width
