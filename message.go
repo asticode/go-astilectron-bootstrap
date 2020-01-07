@@ -2,10 +2,10 @@ package bootstrap
 
 import (
 	"encoding/json"
+	"fmt"
 
+	"github.com/asticode/go-astikit"
 	"github.com/asticode/go-astilectron"
-	"github.com/asticode/go-astilog"
-	"github.com/pkg/errors"
 )
 
 // MessageOut represents a message going out
@@ -20,21 +20,20 @@ type MessageIn struct {
 	Payload json.RawMessage `json:"payload,omitempty"`
 }
 
-// HandleMessages handles messages
-func HandleMessages(w *astilectron.Window, messageHandler MessageHandler) astilectron.ListenerMessage {
+func handleMessages(w *astilectron.Window, messageHandler MessageHandler, l astikit.SeverityLogger) astilectron.ListenerMessage {
 	return func(m *astilectron.EventMessage) (v interface{}) {
 		// Unmarshal message
 		var i MessageIn
 		var err error
 		if err = m.Unmarshal(&i); err != nil {
-			astilog.Error(errors.Wrapf(err, "unmarshaling message %+v failed", *m))
+			l.Error(fmt.Errorf("unmarshaling message %+v failed: %w", *m, err))
 			return
 		}
 
 		// Handle message
 		var p interface{}
 		if p, err = messageHandler(w, i); err != nil {
-			astilog.Error(errors.Wrapf(err, "handling message %+v failed", i))
+			l.Error(fmt.Errorf("handling message %+v failed: %w", i, err))
 		}
 
 		// Return message
@@ -61,7 +60,6 @@ func SendMessage(w *astilectron.Window, name string, payload interface{}, cs ...
 			if e != nil {
 				m = &MessageIn{}
 				if err := e.Unmarshal(m); err != nil {
-					astilog.Error(errors.Wrap(err, "unmarshaling event message failed"))
 					return
 				}
 			}
