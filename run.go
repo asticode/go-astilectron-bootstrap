@@ -27,7 +27,7 @@ func Run(o Options) (err error) {
 	defer a.Close()
 
 	// Handle signals
-	a.HandleSignals()
+	a.HandleSignals(astikit.LoggerSignalHandler(l, o.IgnoredSignals...))
 
 	// Adapt astilectron
 	if o.Adapter != nil {

@@ -1,6 +1,8 @@
 package bootstrap
 
 import (
+	"os"
+
 	"github.com/asticode/go-astikit"
 	"github.com/asticode/go-astilectron"
 )
@@ -12,6 +14,7 @@ type Options struct {
 	AssetDir           AssetDir
 	AstilectronOptions astilectron.Options
 	Debug              bool
+	IgnoredSignals     []os.Signal
 	Logger             astikit.StdLogger
 	MenuOptions        []*astilectron.MenuItemOptions
 	MenuOptionsFunc    func(*astilectron.Astilectron) []*astilectron.MenuItemOptions
