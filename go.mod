@@ -4,6 +4,6 @@ go 1.13
 
 require (
 	github.com/asticode/go-astikit v0.15.0
-	github.com/asticode/go-astilectron v0.22.6
-	github.com/asticode/go-astilectron-bundler v0.7.9
+	github.com/asticode/go-astilectron v0.23.0
+	github.com/asticode/go-astilectron-bundler v0.7.10
 )
