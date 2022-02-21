@@ -24,6 +24,7 @@ type Options struct {
 	TrayMenuOptions    []*astilectron.MenuItemOptions
 	TrayOptions        *astilectron.TrayOptions
 	Windows            []*Window
+	WithOns            map[string]WithOn
 }
 
 // Options to setup and create a new window
@@ -54,3 +55,5 @@ type RestoreAssets func(dir, name string) error
 
 // WindowAdapter is a function that adapts a window
 type WindowAdapter func(w *astilectron.Window)
+
+type WithOn func(e astilectron.Event) (deleteListener bool)

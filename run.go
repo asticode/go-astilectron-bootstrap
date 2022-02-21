@@ -58,6 +58,12 @@ func Run(o Options) (err error) {
 		return fmt.Errorf("starting astilectron failed: %w", err)
 	}
 
+	for s, on := range o.WithOns {
+		a.On(s, func(e astilectron.Event) (deleteListener bool) {
+			return on(e)
+		})
+	}
+
 	// Init windows
 	var w = make([]*astilectron.Window, len(o.Windows))
 	for i, wo := range o.Windows {
