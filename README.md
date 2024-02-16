@@ -2,6 +2,10 @@ This package allows you to quickly create a multi-window application using [asti
 
 Check out the [demo](https://github.com/asticode/go-astilectron-demo) to see a working example with the [bundler](https://github.com/asticode/go-astilectron-bundler).
 
+# Warning
+
+This project is not maintained anymore.
+
 # Important
 
 - by default all resources should be in a `resources` folder. If you want to put them in a different folder, be sure to provide its path with the `ResourcesPath` option
